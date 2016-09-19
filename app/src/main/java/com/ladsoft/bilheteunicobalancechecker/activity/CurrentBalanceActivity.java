@@ -1,6 +1,10 @@
 package com.ladsoft.bilheteunicobalancechecker.activity;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -8,14 +12,22 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.ladsoft.bilheteunicobalancechecker.R;
+import com.ladsoft.bilheteunicobalancechecker.databinding.ActivityCurrentBalanceBinding;
+import com.ladsoft.bilheteunicobalancechecker.presenter.BalancePresenter;
+import com.ladsoft.bilheteunicobalancechecker.presenter.CurrentBalancePresenter;
 
 public class CurrentBalanceActivity extends AppCompatActivity {
+
+    ActivityCurrentBalanceBinding binding;
+    private BalancePresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_current_balance);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -28,6 +40,11 @@ public class CurrentBalanceActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_current_balance);
+        presenter = new CurrentBalancePresenter(new Handler(), callback);
+
+        mapEvents();
     }
 
     @Override
@@ -50,4 +67,20 @@ public class CurrentBalanceActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void mapEvents() {
+        binding.contentCurrentBalance.go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenter.getCurrentBalance();
+            }
+        });
+    }
+
+    private CurrentBalancePresenter.WorkerThread.Callback callback = new CurrentBalancePresenter.WorkerThread.Callback() {
+        @Override
+        public void onBalanceResponse(String value) {
+            Toast.makeText(getBaseContext(), value, Toast.LENGTH_LONG).show();
+        }
+    };
 }
