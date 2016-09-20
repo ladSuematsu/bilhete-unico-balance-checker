@@ -1,6 +1,7 @@
 package com.ladsoft.bilheteunicobalancechecker.activity;
 
 import android.databinding.DataBindingUtil;
+import android.icu.text.IDNA;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.ladsoft.bilheteunicobalancechecker.R;
 import com.ladsoft.bilheteunicobalancechecker.databinding.ActivityCurrentBalanceBinding;
+import com.ladsoft.bilheteunicobalancechecker.model.BilheteUnicoInfo;
 import com.ladsoft.bilheteunicobalancechecker.presenter.BalancePresenter;
 import com.ladsoft.bilheteunicobalancechecker.presenter.CurrentBalancePresenter;
 
@@ -79,8 +81,8 @@ public class CurrentBalanceActivity extends AppCompatActivity {
 
     private CurrentBalancePresenter.WorkerThread.Callback callback = new CurrentBalancePresenter.WorkerThread.Callback() {
         @Override
-        public void onBalanceResponse(String value) {
-            Toast.makeText(getBaseContext(), value, Toast.LENGTH_LONG).show();
+        public void onBalanceResponse(BilheteUnicoInfo info) {
+            Toast.makeText(getBaseContext(), String.valueOf(info.getCommonPassBalance()), Toast.LENGTH_LONG).show();
         }
     };
 }
