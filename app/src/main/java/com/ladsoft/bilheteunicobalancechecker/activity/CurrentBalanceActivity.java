@@ -20,6 +20,8 @@ import com.ladsoft.bilheteunicobalancechecker.databinding.ActivityCurrentBalance
 import com.ladsoft.bilheteunicobalancechecker.model.BilheteUnicoInfo;
 import com.ladsoft.bilheteunicobalancechecker.presenter.BalancePresenter;
 import com.ladsoft.bilheteunicobalancechecker.presenter.CurrentBalancePresenter;
+import com.ladsoft.bilheteunicobalancechecker.task.TaskCallback;
+import com.ladsoft.bilheteunicobalancechecker.task.TransurcTask;
 
 public class CurrentBalanceActivity extends AppCompatActivity {
 
@@ -79,7 +81,7 @@ public class CurrentBalanceActivity extends AppCompatActivity {
         });
     }
 
-    private CurrentBalancePresenter.WorkerThread.Callback callback = new CurrentBalancePresenter.WorkerThread.Callback() {
+    private TaskCallback callback = new TaskCallback() {
         @Override
         public void onBalanceResponse(BilheteUnicoInfo info) {
             Toast.makeText(getBaseContext(), String.valueOf(info.getCommonPassBalance()), Toast.LENGTH_LONG).show();
