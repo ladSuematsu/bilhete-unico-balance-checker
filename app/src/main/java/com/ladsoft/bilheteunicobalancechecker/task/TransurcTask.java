@@ -31,7 +31,7 @@ public class TransurcTask extends HandlerThread {
         workerHandler = new Handler(getLooper(), new Handler.Callback() {
             @Override
             public boolean handleMessage(Message message) {
-                getCurrentBalance(message);
+                getCurrentBalance(message.obj);
                 return true;
             }
         });
@@ -60,8 +60,11 @@ public class TransurcTask extends HandlerThread {
 
             TransurcBilheteUnicoQueryParameter queueValues = (TransurcBilheteUnicoQueryParameter) queueParameters;
 
+            String id = queueValues.getId().replaceAll("(\\.|-)+", "|");
+
+
             StringBuilder builder = new StringBuilder().append(ENDPOINT_URL)
-                    .append(queueValues.getId()).append(REQUEST_PARAMETER_SEPARATOR)
+                    .append(id).append(REQUEST_PARAMETER_SEPARATOR)
                     .append(queueValues.getBirthDate());
 
             Document document = Jsoup.connect(builder.toString()).timeout(DEFAULT_TIMEOUT).get();

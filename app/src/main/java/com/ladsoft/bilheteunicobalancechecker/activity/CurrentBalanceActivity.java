@@ -76,7 +76,7 @@ public class CurrentBalanceActivity extends AppCompatActivity {
         binding.contentCurrentBalance.go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presenter.getCurrentBalance();
+                presenter.getCurrentBalance("21.04.01079579-1", "15/02/1988");
             }
         });
     }
