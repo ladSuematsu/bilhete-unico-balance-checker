@@ -4,7 +4,9 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 
+import com.ladsoft.bilheteunicobalancechecker.BuildConfig;
 import com.ladsoft.bilheteunicobalancechecker.model.BilheteUnicoInfo;
+import com.ladsoft.bilheteunicobalancechecker.model.TransurcBilheteUnicoQueryParameter;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,16 +31,23 @@ public class TransurcTask extends HandlerThread {
         workerHandler = new Handler(getLooper(), new Handler.Callback() {
             @Override
             public boolean handleMessage(Message message) {
-                getCurrentBalance();
+                getCurrentBalance(message.obj);
                 return true;
             }
         });
     }
 
-    public void post() {
-        workerHandler.obtainMessage().sendToTarget();
+    public void post(Object queryParameters) {
+        Message message = workerHandler.obtainMessage();
+        message.obj = queryParameters;
+        message.sendToTarget();
     }
 
+
+    private final static String ENDPOINT_URL = BuildConfig.TRANSURC_ENDPOINT_URL;
+    private static final int DEFAULT_TIMEOUT = BuildConfig.REQUEST_TIMEOUT_SECS * 1000;
+
+    private static final String REQUEST_PARAMETER_SEPARATOR = "|";
     private static final String CARD_NUMBER_FIELD = "#ContentPlaceHolder1_lblNumCartao";
     private static final String USER_NAME_FIELD = "#ContentPlaceHolder1_lblNomeUsuario";
     private static final String STATUS_VALUE_FIELD = "#ContentPlaceHolder1_lblStatusCartao";
@@ -46,9 +55,19 @@ public class TransurcTask extends HandlerThread {
     private static final String COMMON_PASS_BALANCE_DATE = "#ContentPlaceHolder1_lblDtSaldo_CO";
     private static final String VT_BALANCE_VALUE_FIELD = "#ContentPlaceHolder1_lblSaldoAtual_VT";
     private static final String VT_BALANCE_DATE = "#ContentPlaceHolder1_lblDtSaldo_VT";
-    private void getCurrentBalance() {
+    private void getCurrentBalance(Object queueParameters) {
         try {
-            Document document = Jsoup.connect("http://www.transurc.com.br/SiteApp/Movel/Saldo/ResultadoSaldoMovel.aspx?d=21|04|01079579|1|15/02/1988").get();
+
+            TransurcBilheteUnicoQueryParameter queueValues = (TransurcBilheteUnicoQueryParameter) queueParameters;
+
+            String id = queueValues.getId().replaceAll("(\\.|-)+", "|");
+
+
+            StringBuilder builder = new StringBuilder().append(ENDPOINT_URL)
+                    .append(id).append(REQUEST_PARAMETER_SEPARATOR)
+                    .append(queueValues.getBirthDate());
+
+            Document document = Jsoup.connect(builder.toString()).timeout(DEFAULT_TIMEOUT).get();
 
             Elements fields = new Elements();
             fields.addAll(document.select(CARD_NUMBER_FIELD));
