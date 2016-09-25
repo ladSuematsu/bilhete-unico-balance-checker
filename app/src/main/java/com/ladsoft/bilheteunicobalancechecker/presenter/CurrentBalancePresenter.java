@@ -2,6 +2,7 @@ package com.ladsoft.bilheteunicobalancechecker.presenter;
 
 import android.os.Handler;
 
+import com.ladsoft.bilheteunicobalancechecker.model.TransurcBilheteUnicoQueryParameter;
 import com.ladsoft.bilheteunicobalancechecker.task.TaskCallback;
 import com.ladsoft.bilheteunicobalancechecker.task.TransurcTask;
 
@@ -17,7 +18,7 @@ public class CurrentBalancePresenter implements BalancePresenter {
 
     @Override
     public void getCurrentBalance() {
-        workerThread.post();
+        workerThread.post(new TransurcBilheteUnicoQueryParameter("21|04|01079579|1", "15/02/1988"));
     }
 
 }
