@@ -1,6 +1,7 @@
 <resources>
     <string name="card_id">Número do cartão</string>
     <string name="birth_date">Data de nascimento</string>
+    <string name="required_field">Campo obrigatório</string>
 
 
 </resources>

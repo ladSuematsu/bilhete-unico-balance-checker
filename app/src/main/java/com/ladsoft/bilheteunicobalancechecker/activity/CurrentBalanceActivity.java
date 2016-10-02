@@ -21,7 +21,12 @@ import com.ladsoft.bilheteunicobalancechecker.presenter.CurrentBalancePresenter;
 import com.ladsoft.bilheteunicobalancechecker.task.TaskCallback;
 import com.ladsoft.view.text.Mask;
 
+import static android.provider.Settings.System.DATE_FORMAT;
+
 public class CurrentBalanceActivity extends AppCompatActivity {
+
+    private static final String CARD_ID_MASK = "##.##.########-#";
+    private static final String DATE_MASK = "##/##/####";
 
     ActivityCurrentBalanceBinding binding;
     private BalancePresenter presenter;
@@ -71,22 +76,41 @@ public class CurrentBalanceActivity extends AppCompatActivity {
     }
 
     private void setupViews() {
+        binding.contentCurrentBalance.birthDateWrapper.setErrorEnabled(true);
+        binding.contentCurrentBalance.cardIdWrapper.setErrorEnabled(true);
+
         binding.contentCurrentBalance.cardId.setInputType(InputType.TYPE_CLASS_NUMBER);
-        binding.contentCurrentBalance.cardId.addTextChangedListener(Mask.get("##.##.########-#", binding.contentCurrentBalance.cardId));
+        binding.contentCurrentBalance.cardId.addTextChangedListener(Mask.get(CARD_ID_MASK, binding.contentCurrentBalance.cardId));
 
         binding.contentCurrentBalance.birthDate.setInputType(InputType.TYPE_CLASS_NUMBER);
-        binding.contentCurrentBalance.birthDate.addTextChangedListener(Mask.get("##/##/####", binding.contentCurrentBalance.birthDate));
+        binding.contentCurrentBalance.birthDate.addTextChangedListener(Mask.get(DATE_MASK, binding.contentCurrentBalance.birthDate));
 
         binding.contentCurrentBalance.go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                cleanFieldErrors();
                 presenter.getCurrentBalance(binding.contentCurrentBalance.cardId.getText().toString(),
                         binding.contentCurrentBalance.birthDate.getText().toString());
             }
         });
     }
 
-    private TaskCallback callback = new TaskCallback() {
+    private void cleanFieldErrors() {
+        binding.contentCurrentBalance.cardIdWrapper.setError(null);
+        binding.contentCurrentBalance.birthDateWrapper.setError(null);
+    }
+
+    private CurrentBalancePresenter.CurrentBalancePresenterCallback callback = new CurrentBalancePresenter.CurrentBalancePresenterCallback() {
+        @Override
+        public void onInvalidCardId() {
+            binding.contentCurrentBalance.cardIdWrapper.setError(getString(R.string.required_field));
+        }
+
+        @Override
+        public void onInvalidBirthdate() {
+            binding.contentCurrentBalance.birthDateWrapper.setError(getString(R.string.required_field));
+        }
+
         @Override
         public void onBalanceResponse(BilheteUnicoInfo info) {
             Toast.makeText(getBaseContext(), String.valueOf(info.getCommonPassBalance()), Toast.LENGTH_LONG).show();
