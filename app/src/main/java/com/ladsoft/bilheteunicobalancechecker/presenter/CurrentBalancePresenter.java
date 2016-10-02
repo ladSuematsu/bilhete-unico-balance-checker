@@ -19,7 +19,6 @@ public class CurrentBalancePresenter implements BalancePresenter {
     @Override
     public void getCurrentBalance(String cardId, String date) {
         workerThread.post(new TransurcBilheteUnicoQueryParameter(cardId, date));
-//        workerThread.post(new TransurcBilheteUnicoQueryParameter("21.04.01079579-1", "15/02/1988"));
 
     }
 }
