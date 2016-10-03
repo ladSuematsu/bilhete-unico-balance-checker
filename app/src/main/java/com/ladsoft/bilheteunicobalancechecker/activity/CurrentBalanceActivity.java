@@ -25,9 +25,6 @@ import static android.provider.Settings.System.DATE_FORMAT;
 
 public class CurrentBalanceActivity extends AppCompatActivity {
 
-    private static final String CARD_ID_MASK = "##.##.########-#";
-    private static final String DATE_MASK = "##/##/####";
-
     ActivityCurrentBalanceBinding binding;
     private BalancePresenter presenter;
 
@@ -80,10 +77,10 @@ public class CurrentBalanceActivity extends AppCompatActivity {
         binding.contentCurrentBalance.cardIdWrapper.setErrorEnabled(true);
 
         binding.contentCurrentBalance.cardId.setInputType(InputType.TYPE_CLASS_NUMBER);
-        binding.contentCurrentBalance.cardId.addTextChangedListener(Mask.get(CARD_ID_MASK, binding.contentCurrentBalance.cardId));
+        binding.contentCurrentBalance.cardId.addTextChangedListener(Mask.get(BalancePresenter.CARD_ID_MASK, binding.contentCurrentBalance.cardId));
 
         binding.contentCurrentBalance.birthDate.setInputType(InputType.TYPE_CLASS_NUMBER);
-        binding.contentCurrentBalance.birthDate.addTextChangedListener(Mask.get(DATE_MASK, binding.contentCurrentBalance.birthDate));
+        binding.contentCurrentBalance.birthDate.addTextChangedListener(Mask.get(BalancePresenter.DATE_MASK, binding.contentCurrentBalance.birthDate));
 
         binding.contentCurrentBalance.go.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,12 +100,12 @@ public class CurrentBalanceActivity extends AppCompatActivity {
     private CurrentBalancePresenter.CurrentBalancePresenterCallback callback = new CurrentBalancePresenter.CurrentBalancePresenterCallback() {
         @Override
         public void onInvalidCardId() {
-            binding.contentCurrentBalance.cardIdWrapper.setError(getString(R.string.required_field));
+            binding.contentCurrentBalance.cardIdWrapper.setError(getString(R.string.invalid_value));
         }
 
         @Override
         public void onInvalidBirthdate() {
-            binding.contentCurrentBalance.birthDateWrapper.setError(getString(R.string.required_field));
+            binding.contentCurrentBalance.birthDateWrapper.setError(getString(R.string.invalid_value));
         }
 
         @Override
