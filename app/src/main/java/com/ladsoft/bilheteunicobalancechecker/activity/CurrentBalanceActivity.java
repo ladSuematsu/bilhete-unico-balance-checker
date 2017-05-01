@@ -16,17 +16,17 @@ import android.widget.Toast;
 import com.ladsoft.bilheteunicobalancechecker.R;
 import com.ladsoft.bilheteunicobalancechecker.databinding.ActivityCurrentBalanceBinding;
 import com.ladsoft.bilheteunicobalancechecker.model.BilheteUnicoInfo;
-import com.ladsoft.bilheteunicobalancechecker.presenter.BalancePresenter;
-import com.ladsoft.bilheteunicobalancechecker.presenter.CurrentBalancePresenter;
-import com.ladsoft.bilheteunicobalancechecker.task.TaskCallback;
+import com.ladsoft.bilheteunicobalancechecker.mvp.BilheteUnicoCheckerMvp;
+import com.ladsoft.bilheteunicobalancechecker.mvp.presenter.CurrentBalancePresenter;
 import com.ladsoft.view.text.Mask;
 
-import static android.provider.Settings.System.DATE_FORMAT;
+import static com.ladsoft.bilheteunicobalancechecker.mvp.BilheteUnicoCheckerMvp.CARD_ID_MASK;
+import static com.ladsoft.bilheteunicobalancechecker.mvp.BilheteUnicoCheckerMvp.DATE_MASK;
 
-public class CurrentBalanceActivity extends AppCompatActivity {
+public class CurrentBalanceActivity extends AppCompatActivity implements BilheteUnicoCheckerMvp.View {
 
     ActivityCurrentBalanceBinding binding;
-    private BalancePresenter presenter;
+    private BilheteUnicoCheckerMvp.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,19 +36,17 @@ public class CurrentBalanceActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_current_balance);
-        presenter = new CurrentBalancePresenter(new Handler(), callback);
+        presenter = new CurrentBalancePresenter(new Handler());
 
         setupViews();
+        presenter.attachView(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        presenter.detachView();
     }
 
     @Override
@@ -77,10 +75,10 @@ public class CurrentBalanceActivity extends AppCompatActivity {
         binding.contentCurrentBalance.cardIdWrapper.setErrorEnabled(true);
 
         binding.contentCurrentBalance.cardId.setInputType(InputType.TYPE_CLASS_NUMBER);
-        binding.contentCurrentBalance.cardId.addTextChangedListener(Mask.get(BalancePresenter.CARD_ID_MASK, binding.contentCurrentBalance.cardId));
+        binding.contentCurrentBalance.cardId.addTextChangedListener(Mask.get(CARD_ID_MASK, binding.contentCurrentBalance.cardId));
 
         binding.contentCurrentBalance.birthDate.setInputType(InputType.TYPE_CLASS_NUMBER);
-        binding.contentCurrentBalance.birthDate.addTextChangedListener(Mask.get(BalancePresenter.DATE_MASK, binding.contentCurrentBalance.birthDate));
+        binding.contentCurrentBalance.birthDate.addTextChangedListener(Mask.get(DATE_MASK, binding.contentCurrentBalance.birthDate));
 
         binding.contentCurrentBalance.go.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,20 +95,18 @@ public class CurrentBalanceActivity extends AppCompatActivity {
         binding.contentCurrentBalance.birthDateWrapper.setError(null);
     }
 
-    private CurrentBalancePresenter.CurrentBalancePresenterCallback callback = new CurrentBalancePresenter.CurrentBalancePresenterCallback() {
-        @Override
-        public void onInvalidCardId() {
-            binding.contentCurrentBalance.cardIdWrapper.setError(getString(R.string.invalid_value));
-        }
+    @Override
+    public void onInvalidCardId() {
+        binding.contentCurrentBalance.cardIdWrapper.setError(getString(R.string.invalid_value));
+    }
 
-        @Override
-        public void onInvalidBirthdate() {
-            binding.contentCurrentBalance.birthDateWrapper.setError(getString(R.string.invalid_value));
-        }
+    @Override
+    public void onInvalidBirthdate() {
+        binding.contentCurrentBalance.birthDateWrapper.setError(getString(R.string.invalid_value));
+    }
 
-        @Override
-        public void onBalanceResponse(BilheteUnicoInfo info) {
-            Toast.makeText(getBaseContext(), String.valueOf(info.getCommonPassBalance()), Toast.LENGTH_LONG).show();
-        }
-    };
+    @Override
+    public void refreshBalance(BilheteUnicoInfo info) {
+        binding.contentCurrentBalance.currentBalance.setText(String.valueOf(info.getCommonPassBalance()));
+    }
 }

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Bilhete Único Balance Checker</string>
+    <string name="empty_balance_check">Faça uma consulta</string>>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
